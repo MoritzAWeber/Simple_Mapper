@@ -2,9 +2,9 @@
 
 import math
 
-import rclpy
 from geometry_msgs.msg import Point
 from nav_msgs.msg import Odometry
+import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from visualization_msgs.msg import Marker
@@ -12,10 +12,10 @@ from visualization_msgs.msg import Marker
 
 class LaserSimulatorNode(Node):
     def __init__(self) -> None:
-        super().__init__("laser_simulator")
+        super().__init__('laser_simulator')
 
         self.get_logger().info(
-            "Laser Simulator Node wurde gestartet."
+            'Laser Simulator Node wurde gestartet.'
         )
 
         self.robot_x = 0.0
@@ -32,20 +32,20 @@ class LaserSimulatorNode(Node):
 
         self.odom_subscription = self.create_subscription(
             Odometry,
-            "/odom",
+            '/odom',
             self.odom_callback,
             10,
         )
 
         self.scan_publisher = self.create_publisher(
             LaserScan,
-            "/scan",
+            '/scan',
             10,
         )
 
         self.ray_marker_publisher = self.create_publisher(
             Marker,
-            "/scan_rays",
+            '/scan_rays',
             10,
         )
 
@@ -88,7 +88,7 @@ class LaserSimulatorNode(Node):
         scan = LaserScan()
 
         scan.header.stamp = self.get_clock().now().to_msg()
-        scan.header.frame_id = "laser_frame"
+        scan.header.frame_id = 'laser_frame'
 
         measurement_count = 360
 
@@ -148,9 +148,9 @@ class LaserSimulatorNode(Node):
         marker = Marker()
 
         marker.header.stamp = scan.header.stamp
-        marker.header.frame_id = "laser_frame"
+        marker.header.frame_id = 'laser_frame'
 
-        marker.ns = "lidar_rays"
+        marker.ns = 'lidar_rays'
         marker.id = 0
 
         marker.type = Marker.LINE_LIST
@@ -273,5 +273,5 @@ def main(args=None) -> None:
         rclpy.shutdown()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

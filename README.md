@@ -49,24 +49,60 @@ Requirements:
 
 - Ubuntu 24.04 and ROS 2 Jazzy
 - `colcon` and `rosdep`
+- `uv`
 - Python 3.12
-- NumPy
 
-From the repository root:
+ROS dependencies are declared in `src/slam_playground/package.xml`. Additional
+Python runtime and development dependencies are declared in `pyproject.toml`
+and pinned reproducibly in `uv.lock`. The uv environment uses the system Python
+interpreter so that it remains compatible with the Python packages supplied by
+ROS 2, while uv-installed packages remain isolated from the global Python
+installation.
+
+From the repository root, install the ROS dependencies and create the local uv
+environment once:
 
 ```bash
 source /opt/ros/jazzy/setup.bash
 rosdep install --from-paths src --ignore-src --rosdistro jazzy -y
-colcon build --symlink-install --packages-select slam_playground
+export UV_PROJECT_ENVIRONMENT=slam_env
+uv venv --python /usr/bin/python3 --system-site-packages slam_env
+touch slam_env/COLCON_IGNORE
+uv sync --locked
+```
+
+Activate the environment and build the ROS package:
+
+```bash
+source slam_env/bin/activate
+source /opt/ros/jazzy/setup.bash
+python /usr/bin/colcon build --symlink-install --packages-select slam_playground
 source install/setup.bash
 ```
 
-ROS dependencies are declared in `src/slam_playground/package.xml`. The NumPy
-dependency is declared in `pyproject.toml`.
+Invoking the system `colcon` script through the active environment's `python`
+is intentional. It makes the installed ROS executables use `slam_env` and
+therefore gives the nodes access to the dependencies installed by uv.
+
+Do not install project dependencies with system-wide `pip`, `pip --user`, or
+`uv pip --system`. Add or remove non-ROS Python dependencies with `uv add` and
+`uv remove`; both commands update `pyproject.toml`, `uv.lock`, and `slam_env`.
+Set `UV_PROJECT_ENVIRONMENT=slam_env` in the current shell before using these
+commands. After pulling dependency changes, run `uv sync --locked` again.
 
 ## Run
 
-After sourcing ROS 2 and the built workspace:
+In each new terminal, activate the uv environment before sourcing ROS 2 and the
+built workspace:
+
+```bash
+export UV_PROJECT_ENVIRONMENT=slam_env
+source slam_env/bin/activate
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+```
+
+Then launch the demo:
 
 ```bash
 ros2 launch slam_playground moving_robot.launch.py
@@ -101,13 +137,12 @@ The package includes the standard ament Flake8, PEP 257, and copyright test
 wrappers:
 
 ```bash
-colcon test --packages-select slam_playground
-colcon test-result --verbose
+python /usr/bin/colcon test --packages-select slam_playground
+python /usr/bin/colcon test-result --verbose
 ```
 
-The copyright test is explicitly skipped. No functional tests currently
-exercise the simulation or mapper. Test results have not been verified as part
-of this documentation update.
+The copyright test is explicitly skipped. The Flake8 and PEP 257 tests pass.
+No functional tests currently exercise the simulation or mapper.
 
 ## What remains to do
 
@@ -122,7 +157,7 @@ and the pose-estimation and correction components required for actual 2D SLAM.
 |-- README.md
 |-- TODO.md
 |-- pyproject.toml
-|-- start_slam.sh
+|-- uv.lock
 +-- src/slam_playground/
     |-- package.xml
     |-- setup.py
@@ -134,9 +169,10 @@ and the pose-estimation and correction components required for actual 2D SLAM.
     +-- test/
 ```
 
-`start_slam.sh` is a local convenience script with a hard-coded workspace
-path. It only sources the ROS 2 and workspace environments; it does not build
-the workspace or launch nodes.
+The generated `slam_env` directory contains the local Python environment and
+is not committed. Its `COLCON_IGNORE` marker prevents `colcon` from inspecting
+the environment as part of the workspace. `UV_PROJECT_ENVIRONMENT` tells uv to
+manage this directory instead of its default `.venv` path.
 
 ## License
 

@@ -4,9 +4,6 @@ This file tracks concrete work that is not implemented in the repository.
 
 ## Tooling and documentation
 
-- [ ] Replace or remove the hard-coded workspace path in `start_slam.sh`, and
-  define whether the script should only source the workspace or also start the
-  demo.
 - [ ] Add a reusable RViz 2 configuration if one is needed for the demo.
 
 ## Mapping and SLAM

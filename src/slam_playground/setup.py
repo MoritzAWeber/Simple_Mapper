@@ -1,6 +1,7 @@
-from setuptools import find_packages, setup
-import os
 from glob import glob
+import os
+
+from setuptools import find_packages, setup
 
 package_name = 'slam_playground'
 
@@ -13,8 +14,8 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (
-            os.path.join("share", package_name, "launch"),
-            glob("launch/*.launch.py"),
+            os.path.join('share', package_name, 'launch'),
+            glob('launch/*.launch.py'),
         ),
     ],
     install_requires=['setuptools'],
@@ -30,9 +31,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-        "robot_motion = slam_playground.moving_robot.robot_motion_node:main",
-        "laser_simulator = slam_playground.moving_robot.laser_simulator_node:main",
-        "simple_mapper = slam_playground.moving_robot.simple_mapper_node:main",
+            'robot_motion = slam_playground.moving_robot.robot_motion_node:main',
+            'laser_simulator = slam_playground.moving_robot.laser_simulator_node:main',
+            'simple_mapper = slam_playground.moving_robot.simple_mapper_node:main',
         ],
     },
 )

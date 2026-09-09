@@ -1,17 +1,19 @@
-import rclpy
-from nav_msgs.msg import Odometry
-from rclpy.node import Node
 import math
+
 from geometry_msgs.msg import TransformStamped
-from tf2_ros import TransformBroadcaster
+from nav_msgs.msg import Odometry
+import rclpy
+from rclpy.node import Node
 from tf2_ros import StaticTransformBroadcaster
+from tf2_ros import TransformBroadcaster
+
 
 class RobotMotionNode(Node):
     def __init__(self):
-        super().__init__("robot_motion_node")
-        
-        self.get_logger().info("Robot Motion Node wurde gestartet.")
-        
+        super().__init__('robot_motion_node')
+
+        self.get_logger().info('Robot Motion Node wurde gestartet.')
+
         self.timer_period = 0.2
         self.simulation_time = 0.0
 
@@ -20,7 +22,7 @@ class RobotMotionNode(Node):
         self.static_tf_broadcaster = StaticTransformBroadcaster(self)
         self.publish_laser_transform()
 
-        self.odom_publisher = self.create_publisher(Odometry, "/odom", 10)
+        self.odom_publisher = self.create_publisher(Odometry, '/odom', 10)
         self.timer = self.create_timer(self.timer_period, self.motion_callback)
 
     def motion_callback(self) -> None:
@@ -61,8 +63,8 @@ class RobotMotionNode(Node):
         message = Odometry()
 
         message.header.stamp = stamp
-        message.header.frame_id = "odom"
-        message.child_frame_id = "base_link"
+        message.header.frame_id = 'odom'
+        message.child_frame_id = 'base_link'
 
         message.pose.pose.position.x = x
         message.pose.pose.position.y = y
@@ -85,8 +87,8 @@ class RobotMotionNode(Node):
         transform = TransformStamped()
 
         transform.header.stamp = stamp
-        transform.header.frame_id = "odom"
-        transform.child_frame_id = "base_link"
+        transform.header.frame_id = 'odom'
+        transform.child_frame_id = 'base_link'
 
         transform.transform.translation.x = x
         transform.transform.translation.y = y
@@ -103,8 +105,8 @@ class RobotMotionNode(Node):
         transform = TransformStamped()
 
         transform.header.stamp = self.get_clock().now().to_msg()
-        transform.header.frame_id = "base_link"
-        transform.child_frame_id = "laser_frame"
+        transform.header.frame_id = 'base_link'
+        transform.child_frame_id = 'laser_frame'
 
         transform.transform.translation.x = 0.0
         transform.transform.translation.y = 0.0
@@ -117,8 +119,9 @@ class RobotMotionNode(Node):
 
         self.static_tf_broadcaster.sendTransform(transform)
 
+
 def main(args=None) -> None:
-    rclpy.init(args = args)
+    rclpy.init(args=args)
 
     node = RobotMotionNode()
 
@@ -130,5 +133,6 @@ def main(args=None) -> None:
         node.destroy_node()
         rclpy.shutdown()
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()
